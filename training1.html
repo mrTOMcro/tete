@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training 1 – Unterkörper</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f8f8f8; }
+        .exercise { margin-bottom: 40px; }
+        .exercise img { max-width: 100%; height: auto; border-radius: 10px; }
+        .controls { margin-top: 20px; }
+        button { padding: 10px 20px; font-size: 16px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Training 1 – Unterkörper</h1>
+
+    <audio id="start-sound" src="Ton/Startsignal.mp3" preload="auto"></audio>
+    <audio id="pause-sound" src="Ton/Pausesignal.mp3" preload="auto"></audio>
+
+    <div id="exercise-container"></div>
+
+    <div class="controls">
+        <button onclick="pauseTraining()">Pause</button>
+        <button onclick="resumeTraining()">Weiter</button>
+    </div>
+
+    <script>
+        const exercises = [
+            { name: "Kurzhantel Kniebeugen", duration: 60, img: "Bilder/Training 1/Aufgabe 1.gif" },
+            { name: "Einbeiniges Kurzhantel Beckenheben", duration: 40, img: "Bilder/Training 1/Aufgabe 2.gif" },
+            { name: "Bulgarian Split Squat", duration: 40, img: "Bilder/Training 1/Aufgabe 3.gif" },
+            { name: "Donkey Kickback", duration: 60, img: "Bilder/Training 1/Aufgabe 4.gif" },
+            { name: "Wadenheben", duration: 30, img: "Bilder/Training 1/Aufgabe 5.gif" },
+            { name: "Einbeiniges Kreuzheben", duration: 40, img: "Bilder/Training 1/Aufgabe 6.gif" },
+            { name: "Unterarmstütz", duration: 60, img: "Bilder/Training 1/Aufgabe 7.gif" },
+            { name: "Russian Twist", duration: 60, img: "Bilder/Training 1/Aufgabe 8.gif" }
+        ];
+
+        let index = 0;
+        let paused = false;
+        let timer;
+
+        function playStartSound() {
+            const s = document.getElementById("start-sound");
+            s.currentTime = 0; s.play();
+        }
+
+        function playPauseSound() {
+            const p = document.getElementById("pause-sound");
+            p.currentTime = 0; p.play();
+        }
+
+        function showExercise(i) {
+            const container = document.getElementById("exercise-container");
+            const ex = exercises[i];
+            container.innerHTML = `<div class="exercise">
+                <h2>${ex.name}</h2>
+                <img src="${ex.img}" alt="${ex.name}">
+                <p>Dauer: ${ex.duration} Sekunden</p>
+            </div>`;
+        }
+
+        function startExercise(i) {
+            if (i >= exercises.length) return;
+            index = i;
+            showExercise(i);
+            playStartSound();
+            let timeLeft = exercises[i].duration;
+
+            timer = setInterval(() => {
+                if (!paused) {
+                    timeLeft--;
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        playPauseSound();
+                        setTimeout(() => {
+                            startExercise(i + 1);
+                        }, 1000);
+                    }
+                }
+            }, 1000);
+        }
+
+        function pauseTraining() {
+            paused = true;
+            playPauseSound();
+        }
+
+        function resumeTraining() {
+            if (paused) {
+                paused = false;
+                playStartSound();
+            }
+        }
+
+        window.onload = () => {
+            startExercise(index);
+        };
+    </script>
+</body>
+</html>
